@@ -1,6 +1,17 @@
+"""
+:summary: Utility functions for the package
+
+:license: Creative Commons Attribution-ShareAlike 3.0 Unported
+:author: Mark LaPerriere
+:contact: rundeckrun@mindmind.com
+:copyright: Mark LaPerriere 2013
+"""
+__docformat__ = "restructuredtext en"
+
+
 def child2dict(el):
     """Turns an ElementTree.Element's children into a dict using the node names as dict keys and
-        and the node text as dict values
+    and the node text as dict values
 
     :Parameters:
         el : ElementTree.Element
@@ -13,8 +24,9 @@ def child2dict(el):
 
 def attr2dict(el):
     """Turns an elements attrib dict into... wait for it... a dict. Yea, it's silly to me too.
-        But, according to the ElementTree docs, using the Element.attrib attribute directly
-        is not recommended - don't look at me - I just work here.
+    But, according to the ElementTree docs, using the Element.attrib attribute directly
+    is not recommended - don't look at me - I just work here.
+
     :Parameters:
         el : ElementTree.Element
 
@@ -27,7 +39,7 @@ def attr2dict(el):
 def node2dict(el):
     """Combines both the attr2dict and child2dict functions
     """
-    return dict(attr2dict(el).items() + child2dict(el).items())
+    return dict(list(attr2dict(el).items()) + list(child2dict(el).items()))
 
 
 def cull_kwargs(api_keys, kwargs):
@@ -63,3 +75,12 @@ def dict2argstring(argString):
         return argString
 
 
+try:
+    if isinstance('', basestring):
+        pass
+except NameError:
+    # python 3
+    StringType = type('')
+else:
+    # python 2
+    StringType = basestring

@@ -10,14 +10,19 @@ __docformat__ = "restructuredtext en"
 
 import time
 import errno
-from string import maketrans, ascii_letters, digits
 from datetime import datetime
+from string import ascii_letters, digits
+try:
+    from string import maketrans
+except ImportError:
+    # python 3
+    maketrans = str.maketrans
 
-from api import RundeckApiTolerant, RundeckApi, RundeckNode
-from connection import RundeckConnection
-from transforms import transform
-from util import child2dict, attr2dict, cull_kwargs
-from exceptions import (
+from .api import RundeckApiTolerant, RundeckApi, RundeckNode
+from .connection import RundeckConnection, RundeckResponse
+from .transforms import transform
+from .util import child2dict, attr2dict, cull_kwargs, StringType
+from .exceptions import (
     RundeckServerError,
     JobNotFound,
     MissingProjectArgument,
@@ -26,7 +31,7 @@ from exceptions import (
     InvalidJobDefinitionFormat,
     InvalidResourceSpecification,
     )
-from defaults import (
+from .defaults import (
     GET,
     POST,
     DELETE,
@@ -57,7 +62,7 @@ def is_job_id(job_id):
 
     :rtype: bool
     """
-    if job_id and isinstance(job_id, basestring):
+    if job_id and isinstance(job_id, StringType):
         return job_id.translate(_JOB_ID_TRANS_TAB) == _JOB_ID_TEMPLATE
 
     return False
@@ -92,6 +97,7 @@ class Rundeck(object):
                 an instance of a RundeckConnection or instance of a subclass of RundeckConnection
         """
         api = kwargs.pop('api', None)
+
         if api is None:
             self.api = RundeckApi(
                 server, protocol=protocol, port=port, api_token=api_token, **kwargs)
@@ -339,7 +345,7 @@ class Rundeck(object):
         :return: a job definition
         :rtype: str
         """
-        return self.api.jobs_export(project, **kwargs)
+        return self.api.jobs_export(project, **kwargs).text
 
 
     @transform('job_import_status')
@@ -430,7 +436,16 @@ class Rundeck(object):
         :return: success
         :rtype: bool
         """
-        return self.api.delete_job(job_id, **kwargs).success
+        result = self.api.delete_job(job_id, **kwargs)
+        # api version 11 wil respond with a 204 No Content; older version use the result xml node
+        if self.api_version >= 11:
+            if result.response.status_code == 204:
+                return True
+            else:
+                return False
+        else:
+            rd_msg = RundeckResponse(result)
+            return rd_msg.success
 
 
     def delete_jobs(self, idlist, **kwargs):
@@ -462,7 +477,7 @@ class Rundeck(object):
         # while we're waiting for https://github.com/dtolabs/rundeck/issues/588 to get resolved,
         #   we'll just use iterate over the list of ids and call delete_job - potentially REALLY
         #   painfully slow for large lists
-        if isinstance(idlist, basestring):
+        if isinstance(idlist, StringType):
             idlist = idlist.split(',')
 
         results = []
@@ -471,7 +486,7 @@ class Rundeck(object):
             try:
                 result = self.delete_job(id)
             except RundeckServerError as exc:
-                result = exc.rundecK_response
+                result = exc.rundeck_response
             results.append(result)
 
         return results
