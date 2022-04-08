@@ -1,14 +1,14 @@
 """
 :summary: Exceptions
 
-:license: Creative Commons Attribution-ShareAlike 3.0 Unported
+:license: Apache License, Version 2.0
 :author: Mark LaPerriere
 :contact: rundeckrun@mindmind.com
-:copyright: Mark LaPerriere 2013
+:copyright: Mark LaPerriere 2015
 """
 __docformat__ = "restructuredtext en"
 
-import requests
+from requests.exceptions import HTTPError
 
 class ApiVersionNotSupported(Exception):
     """This library does not support the version of the API requested"""

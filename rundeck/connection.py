@@ -1,10 +1,10 @@
 """
 :summary: Connection object for Rundeck client
 
-:license: Creative Commons Attribution-ShareAlike 3.0 Unported
+:license: Apache License, Version 2.0
 :author: Mark LaPerriere
 :contact: rundeckrun@mindmind.com
-:copyright: Mark LaPerriere 2013
+:copyright: Mark LaPerriere 2015
 
 :requires: requests
 """
@@ -34,13 +34,14 @@ def memoize(obj):
 
 class RundeckResponse(object):
 
-    def __init__(self, response, as_dict_method=None):
+    def __init__(self, response, client_api_version, as_dict_method=None):
         """ Parses an XML string into a convenient Python object
 
         :Parameters:
             response : requests.Response
                 an instance of the requests.Response returned by the associated command request
         """
+        self.client_api_version = client_api_version
         self._as_dict_method = None
         self.response = response
         self.body = self.response.text
@@ -232,7 +233,7 @@ class RundeckConnectionTolerant(object):
             method, url, params=params, data=data, headers=headers, files=files, **kwargs)
 
         if parse_response:
-            return RundeckResponse(response)
+            return RundeckResponse(response, self.api_version)
         else:
             return response
 

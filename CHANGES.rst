@@ -1,3 +1,26 @@
+0.1.13
+------
+- In response to `Issue #23 <https://github.com/marklap/rundeckrun/issues/23>`_, change license to
+  to Apache 2.0. Versions 0.1.12 will maintain the CC license (added a cc-by-sa tag to repo to
+  make it easy to find).
+
+0.1.12
+------
+- In response to `Issue #18 <https://github.com/marklap/rundeckrun/issues/18>`_
+  (many thanks @bobnelson0), update docs to provide information about
+  `Multi-valued <http://rundeck.org/docs/manual/jobs.html#defining-an-option>`_ job options.
+
+0.1.11
+------
+- Merged `Issue #16 <https://github.com/marklap/rundeckrun/issues/16>`_: Fix typo in isinstance
+  call (many thanks @boosh)
+- Fixed broken test init validation
+
+0.1.10
+------
+- Fixed `Issue #15 <https://github.com/marklap/rundeckrun/issues/15>`_: job_executions() in api.py
+  should use GET not POST
+
 0.1.9
 -----
 - Add username/password authentication support (thanks to brendan-sterne)
